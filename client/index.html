@@ -4,7 +4,18 @@
     <meta charset="utf-8">
     <title>AngularJS Resolve</title>
     <link rel="stylesheet" href="lib/bootstrap-2.1.1/css/bootstrap.css"/>
-    </head>
+    <!-- When you load angular at the bottom, you need to create the "ng-cloak" rules yourself -->
+    <style type="text/css">
+        @charset "UTF-8";
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none;
+        }
+
+        ng\:form {
+            display: block;
+        }
+    </style>
+</head>
 <body>
 
 <div ng-app="app" ng-controller="AppCtrl" class="well well-large" style="width: 360px;">
