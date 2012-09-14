@@ -5,33 +5,18 @@ app.config(function ($locationProvider, $routeProvider) {
 
     $routeProvider.when("/:starship", {
         templateUrl:"partials/starship.html",
-        controller :function ($scope, $routeParams, crew) {
-            $scope.img = $routeParams.starship + ".jpg";
-            $scope.crew = crew;
-        },
-        resolve    :{
-            crew:function ($q, $route, $timeout, starTrekResource) {
-                var deferred = $q.defer();
+        controller :function ($scope, $routeParams, $timeout, starTrekResource) {
+            var starship = $routeParams.starship;
+            $scope.img = starship + ".jpg";
+            var successCb = function (result) {
+                $scope.crew = result;
+            };
+            //the timeout is only to exaggerate the example, it's completely unnecessary
+            $timeout(function () {
+                starTrekResource.getCrewByStarship(starship, successCb);
+            }, 2000);
 
-                var starship = $route.current.params.starship;
-
-                var successCb = function (result) {
-                    if (angular.equals(result, [])) {
-                        deferred.reject("No starship found by that name");
-                    }
-                    else {
-                        deferred.resolve(result);
-                    }
-                };
-                //the timeout is only to exaggerate the example, it's completely unnecessary
-                $timeout(function () {
-                    starTrekResource.getCrewByStarship(starship, successCb);
-                }, 2000);
-
-                return deferred.promise;
-            }
         }
-
     });
 });
 
