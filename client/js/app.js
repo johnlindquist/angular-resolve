@@ -1,73 +1,53 @@
-var app = angular.module('app', []);
+var app = angular.module('app', ['starTrekServices']);
 
 app.config(function ($locationProvider, $routeProvider) {
     $routeProvider.when("/", {templateUrl:"partials/home.html"});
-    $routeProvider.when("/cat", {
-        templateUrl:"partials/cat.html",
-        controller :"CatCtrl",
-        resolve    :{
-            toy:function ($timeout, $q) {
-                var defer = $q.defer();
 
-                //delay the response for 2 seconds, then succeed
+    $routeProvider.when("/:starship", {
+        templateUrl:"partials/starship.html",
+        controller :function ($scope, $routeParams, crew) {
+            $scope.img = $routeParams.starship + ".jpg";
+            $scope.crew = crew;
+        },
+        resolve    :{
+            crew:function ($q, $route, $timeout, starTrekResource) {
+                var deferred = $q.defer();
+
+                var starship = $route.current.params.starship;
+
+                var successCb = function (result) {
+                    if (angular.equals(result, [])) {
+                        deferred.reject("No starship found by that name");
+                    }
+                    else {
+                        deferred.resolve(result);
+                    }
+                };
+                //the timeout is only to exaggerate the example, it's completely unnecessary
                 $timeout(function () {
-                    //you can resolve and pass whatever you want here (use a resource, etc)
-                    //the result is passed into the "toy" param in the CatCtrl
-                    defer.resolve(
-                        {type:"yarn"}
-                    );
+                    starTrekResource.getCrewByStarship(starship, successCb);
                 }, 2000);
 
-                return defer.promise;
+                return deferred.promise;
             }
         }
 
     });
-    $routeProvider.when("/dog", {
-        templateUrl:"partials/dog.html",
-        controller :"DogCtrl",
-        resolve    :{
-            toy:function ($timeout, $q) {
-                var defer = $q.defer();
-
-                //delay the response for 2 seconds, then reject
-                $timeout(function () {
-                    //the reject message is only useful for the $routeChangeError rejection
-                    defer.reject("Dogs don't deserve toys!");
-                }, 2000);
-
-                return defer.promise;
-            }
-        }
-    });
-
-    //Even silly demo apps need Easter Eggs :)
-    $routeProvider.when("/aquaman", {templateUrl:"partials/aquaman.html"});
 });
-
-function CatCtrl($scope, toy) {
-    //notice that this is triggered AFTER the route has successfull changed
-    //this means you can prepare any data in the "toy" that you want
-    alert("CatCtrl ready - The cat likes: " + toy.type);
-}
-function DogCtrl($scope, toy) {
-    //this will never happen since we're intentionally failing the route change
-    alert("DogCtrl ready - The dog likes: " + toy.type);
-}
 
 function AppCtrl($scope, $rootScope, $location) {
     $rootScope.$on("$routeChangeStart", function (event, next, current) {
-        $scope.alertType = "alert-info";
-        $scope.alertMessage = "Changing routes";
-        $scope.active = "progress-striped active";
+        $scope.alertType = "";
+        $scope.alertMessage = "Loading...";
+        $scope.active = "progress-striped active progress-warning";
     });
     $rootScope.$on("$routeChangeSuccess", function (event, current, previous) {
         $scope.alertType = "alert-success";
         $scope.alertMessage = "Successfully changed routes :)";
-        $scope.active = "";
+        $scope.active = "progress-success";
     });
     $rootScope.$on("$routeChangeError", function (event, current, previous, rejection) {
-        alert(rejection);
+        alert("ROUTE CHANGE ERROR: " + rejection);
         $scope.alertType = "alert-error";
         $scope.alertMessage = "Failed to change routes :(";
         $scope.active = "";
@@ -78,16 +58,16 @@ function AppCtrl($scope, $rootScope, $location) {
 
     $scope.tabs = [
         {
-            title:"Home - No Resolve",
+            title:"Home",
             url  :"#/"
         },
         {
-            title:"Cats Succeed",
-            url  :"#/cat"
+            title:"Enterprise-D",
+            url  :"#/Enterprise-D"
         },
         {
-            title:"Dogs Fail",
-            url  :"#/dog"
+            title:"Voyager",
+            url  :"#/Voyager"
         }
     ];
 

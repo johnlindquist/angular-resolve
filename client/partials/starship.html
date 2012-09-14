@@ -1,0 +1,17 @@
+<div>
+    <img src="../img/{{img}}" alt="">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="person in crew">
+            <td>{{person.rank}}</td>
+            <td>{{person.name}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
