@@ -3,7 +3,7 @@
 var util = require('util'),
     fs = require('fs'),
     url = require('url'),
-    express = require('express')
+    express = require('express');
 
 var DEFAULT_PORT = 3000;
 
@@ -19,18 +19,18 @@ appHelpers.sendFile = function(pathname, res) {
     });
     file.on('error', function (error) {
         util.puts(error);
-    })
-}
+    });
+};
 
 //send anything with a file extension as normal
 app.get('*.*', function (req, res) {
-    appHelpers.sendFile('.' + req.url, res);
-})
+    appHelpers.sendFile('../client' + req.url, res);
+});
 
 //intercept any paths and send "./index.html":
 app.get('*', function (req, res) {
-    appHelpers.sendFile('./index.html', res);
-})
+    appHelpers.sendFile('../client/index.html', res);
+});
 
 app.listen(DEFAULT_PORT);
-console.log('Listening on port: ' + DEFAULT_PORT)
+console.log('Listening on port: ' + DEFAULT_PORT);
